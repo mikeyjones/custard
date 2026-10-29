@@ -7,6 +7,8 @@
 
 mod add;
 mod common;
+mod feature;
+mod files;
 mod new;
 
 use std::{ffi::OsString, process::ExitCode};
@@ -28,7 +30,7 @@ struct Cli {
 enum Command {
     /// Create an app ready to run, and to deploy to The Custard Factory
     New(new::NewArgs),
-    /// Add part of an app, ready to use: a page
+    /// Add part of an app, ready to use: a page, a feature or a migration
     #[command(subcommand)]
     Add(add::AddCommand),
     /// Build, bundle and serve the app, reloading it on changes (topcoat dev)

@@ -12,6 +12,8 @@ https://raw.githubusercontent.com/tokio-rs/topcoat/refs/tags/v0.11.0/llms.txt
 | Command | Does |
 | --- | --- |
 | `custard add page /path [--auth] [--role r] [--title T]` | Add a page, its modules and their `mod` declarations; `{name}` segments are path parameters |
+| `custard add feature <plural> --field name:type ... [--owned-by user\|org] [--role r] [--no-pages]` | A table, its migration, `src/features/<name>.rs` with `list`/`find`/`create`/`update`/`delete`, and pages to manage it. Types: `text`, `int`, `float`, `bool`, `date`; add `?` for optional |
+| `custard add migration <description>` | An empty, correctly numbered SQL file in `migrations/` |
 | `custard dev` | Build, bundle assets, serve on http://localhost:3000, reload on changes |
 | `cargo check` | Type-check; run it after every change |
 | `custard fmt --rustfmt` | Format Rust and `view!` bodies |
@@ -39,8 +41,15 @@ https://raw.githubusercontent.com/tokio-rs/topcoat/refs/tags/v0.11.0/llms.txt
   taking `&PgPool`, using `sqlx::query_as` with `#[derive(FromRow)]` structs.
   Pages call them with `custard::db(cx)`. Do not use `sqlx::query!` macros:
   builds have no database to check them against.
-- **Schema changes** are new files in `migrations/`, named
-  `<YYYYMMDDHHMMSS>_<description>.sql`. Never edit one that has been deployed.
+- **A new kind of data** starts with `custard add feature`: it writes the
+  migration, the queries and the pages together, and they compile. Change them
+  from there.
+- **Schema changes** are new files from `custard add migration`. Never edit one
+  that has been deployed. After changing a table, update its feature's struct,
+  input and queries to match.
+- **Form fields** that may be blank use
+  `#[serde(default, deserialize_with = "custard::form::optional")]`, and
+  checkboxes `#[serde(default, deserialize_with = "custard::form::checkbox")]`.
 - **Styling** is Tailwind classes in `view!`; the theme's colours are CSS
   variables in `styles.css` (`bg-primary`, `text-muted-foreground`, ...).
 

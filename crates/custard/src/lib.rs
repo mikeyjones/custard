@@ -28,6 +28,7 @@ mod app;
 pub mod auth;
 pub mod db;
 pub mod env;
+pub mod form;
 pub mod storage;
 pub mod telemetry;
 
