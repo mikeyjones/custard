@@ -13,6 +13,10 @@ custard dev
 custard add page /blog/{post_id} --auth
 custard add feature products --field name:text --field price:int --owned-by org
 custard add migration add a sku to products
+custard check            # Rust errors, formatting and Custard's checks, with fixes
+custard routes           # every page: URL, file, href!, who may use it
+custard smoke            # run the app and request every page
+custard screenshot / /products   # PNGs at desktop and phone sizes
 ```
 
 Every command runs without prompting, and `--json` reports what it did (or a
@@ -23,7 +27,7 @@ failure with a `code` and a `fix`) as one JSON object, for coding agents.
 | Crate | What it is |
 | --- | --- |
 | [`custard`](crates/custard) | The library apps use: `custard::App` runs the app; `.custard(platform)` adds the platform to a Topcoat router |
-| [`custard-cli`](crates/custard-cli) | The `custard` command: `new`, `add page`, `add feature`, `add migration`, and Topcoat's `dev`, `fmt`, `ui`, `asset` and `l10n` built in |
+| [`custard-cli`](crates/custard-cli) | The `custard` command: `new`, `add page/feature/migration`, `check`, `routes`, `smoke`, `screenshot`, and Topcoat's `dev`, `fmt`, `ui`, `asset` and `l10n` built in |
 
 ## What the library covers
 
@@ -53,6 +57,9 @@ platform's repository) for each service:
 - **Health**: `GET /up`, 503 while the database cannot be reached.
 - **Assets**: `./bin/<app> assets bundle` writes Topcoat's asset bundle beside
   the binary, which `railpack.json` runs after Railpack's build.
+
+`custard screenshot` uses the Chrome, Chromium, Brave or Edge installed on the
+machine, or the one `CUSTARD_BROWSER` names.
 
 ## Tests
 

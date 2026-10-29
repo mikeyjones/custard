@@ -15,6 +15,8 @@ pub struct Failure {
     pub code: &'static str,
     pub message: String,
     pub fix: Option<String>,
+    /// The command's whole report, when it ran but found problems.
+    pub report: Option<Value>,
 }
 
 impl Failure {
@@ -23,6 +25,7 @@ impl Failure {
             code,
             message: message.into(),
             fix: None,
+            report: None,
         }
     }
 
@@ -55,13 +58,17 @@ pub fn finish(
             ExitCode::SUCCESS
         }
         Err(failure) => {
+            let error =
+                json!({ "code": failure.code, "message": failure.message, "fix": failure.fix });
             if json {
-                let report = json!({
-                    "ok": false,
-                    "error": { "code": failure.code, "message": failure.message, "fix": failure.fix },
-                });
+                let mut report = failure.report.unwrap_or_else(|| json!({}));
+                report["ok"] = json!(false);
+                report["error"] = error;
                 println!("{}", serde_json::to_string_pretty(&report).unwrap());
             } else {
+                if let Some(report) = &failure.report {
+                    println!("{}", summary(report));
+                }
                 eprintln!("error: {}", failure.message);
                 if let Some(fix) = failure.fix {
                     eprintln!("  fix: {fix}");

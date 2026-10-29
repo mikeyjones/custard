@@ -15,7 +15,10 @@ https://raw.githubusercontent.com/tokio-rs/topcoat/refs/tags/v0.11.0/llms.txt
 | `custard add feature <plural> --field name:type ... [--owned-by user\|org] [--role r] [--no-pages]` | A table, its migration, `src/features/<name>.rs` with `list`/`find`/`create`/`update`/`delete`, and pages to manage it. Types: `text`, `int`, `float`, `bool`, `date`; add `?` for optional |
 | `custard add migration <description>` | An empty, correctly numbered SQL file in `migrations/` |
 | `custard dev` | Build, bundle assets, serve on http://localhost:3000, reload on changes |
-| `cargo check` | Type-check; run it after every change |
+| `custard check --json` | Everything wrong: Rust errors and warnings, formatting, unreachable modules, literal links, migrations. Each problem has a file, line and fix. Run it after every change |
+| `custard routes --json` | Every page and route: URL, file, the `href!` to link to it, who may use it |
+| `custard smoke --json [--path /products/1]` | Build, run the app, request every page; failures come with the app's log lines |
+| `custard screenshot / /products [--size name=WxH]` | PNGs of pages at desktop and phone sizes, in `target/custard/screenshots/`. Look at them |
 | `custard fmt --rustfmt` | Format Rust and `view!` bodies |
 | `custard ui add <component>` | Copy a Topcoat UI component into `src/components/` |
 | `custard ui list` | The components available |
@@ -69,9 +72,17 @@ https://raw.githubusercontent.com/tokio-rs/topcoat/refs/tags/v0.11.0/llms.txt
   and panics reach the platform's issue tracker.
 - Paths under `/_custard` belong to the platform; `/up` is the health check.
 
+## Working loop
+
+1. Make the change, starting from `custard add ...` where one fits.
+2. `custard check --json` until it reports no problems.
+3. `custard smoke --json` until every page answers.
+4. `custard screenshot` the pages you changed, look at the pictures, and fix
+   what does not look right: spacing, alignment, contrast, the phone layout.
+
 ## Rules
 
 - Authorise inside every page, route, shard and procedure that needs it; there
   is no global guard.
-- Run `cargo check` after editing, and fix every warning.
+- Run `custard check` after editing, and fix every error and warning.
 - Never commit `.env`.

@@ -1,15 +1,20 @@
 //! `custard`: create Custard apps and work on them.
 //!
 //! Every command runs without prompting, so coding agents can use it as well
-//! as people. `new` takes `--json` to report what it did as one JSON object.
+//! as people, and takes `--json` to report what it did as one JSON object.
 //! The Topcoat CLI is built in: `custard dev`, `fmt`, `ui`, `asset` and `l10n`
 //! are its commands, so nothing else needs installing.
 
 mod add;
+mod check;
 mod common;
 mod feature;
 mod files;
 mod new;
+mod routes;
+mod run;
+mod screenshot;
+mod smoke;
 
 use std::{ffi::OsString, process::ExitCode};
 
@@ -33,6 +38,14 @@ enum Command {
     /// Add part of an app, ready to use: a page, a feature or a migration
     #[command(subcommand)]
     Add(add::AddCommand),
+    /// Everything wrong with the app: Rust's errors and warnings, formatting, and Custard's checks
+    Check(check::CheckArgs),
+    /// Every page and route: its URL, file, href! and who may use it
+    Routes(routes::RoutesArgs),
+    /// Build and run the app, and ask it for every page, reporting any that fail
+    Smoke(smoke::SmokeArgs),
+    /// Take pictures of pages at desktop and phone sizes, with the Chrome or Chromium installed here
+    Screenshot(screenshot::ScreenshotArgs),
     /// Build, bundle and serve the app, reloading it on changes (topcoat dev)
     #[command(disable_help_flag = true)]
     Dev(Passthrough),
@@ -64,6 +77,10 @@ async fn main() -> ExitCode {
     let (name, passthrough) = match Cli::parse().command {
         Command::New(args) => return new::run(args),
         Command::Add(command) => return add::run(command),
+        Command::Check(args) => return check::run(args),
+        Command::Routes(args) => return routes::run(args),
+        Command::Smoke(args) => return smoke::run(args),
+        Command::Screenshot(args) => return screenshot::run(args),
         Command::Dev(p) => ("dev", p),
         Command::Fmt(p) => ("fmt", p),
         Command::Ui(p) => ("ui", p),

@@ -80,6 +80,9 @@ const TEMPLATES: &[Template] = templates![
 
 const NOTES_MIGRATION: &str = include_str!("../templates/app/migrations/create_notes.sql");
 
+/// Added to the theme Topcoat UI installs.
+const STYLES_BASE: &str = include_str!("../templates/app/styles-base.css");
+
 pub fn run(args: NewArgs) -> ExitCode {
     let json = args.json;
     finish(json, create(args), |report| {
@@ -163,6 +166,15 @@ fn create(args: NewArgs) -> Result<serde_json::Value, Failure> {
         write(&root, template.path, &fill(template.contents))?;
         written.push(template.path.to_owned());
     }
+    let styles = fs::read_to_string(root.join("styles.css"))
+        .map_err(|error| Failure::new("generate_failed", format!("styles.css: {error}")))?;
+    write(
+        &root,
+        "styles.css",
+        &format!("{}\n{STYLES_BASE}", styles.trim_end()),
+    )?;
+    written.push("styles.css".to_owned());
+
     let migration = format!(
         "migrations/{}_create_notes.sql",
         chrono::Utc::now().format("%Y%m%d%H%M%S")

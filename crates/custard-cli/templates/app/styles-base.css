@@ -1,0 +1,12 @@
+
+/* Custard: borders and dividers take the theme's colour unless a class says
+   otherwise; Tailwind would use the text colour. */
+@layer base {
+  *,
+  ::after,
+  ::before,
+  ::backdrop,
+  ::file-selector-button {
+    border-color: var(--color-border);
+  }
+}
