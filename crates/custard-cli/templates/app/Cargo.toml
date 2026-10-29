@@ -1,0 +1,25 @@
+[package]
+name = "{{name}}"
+version = "0.1.0"
+edition = "2024"
+# Topcoat needs this Rust, and Railpack installs it when The Custard Factory builds the app.
+rust-version = "1.99"
+
+[dependencies]
+{{custard_dep}}
+chrono = { version = "0.4", features = ["serde"] }
+serde = { version = "1", features = ["derive"] }
+sqlx = { version = "0.9", default-features = false, features = ["runtime-tokio", "postgres", "macros", "migrate", "derive", "chrono"] }
+tokio = { version = "1.51.1", features = ["macros", "rt-multi-thread"] }
+topcoat = { version = "0.11.0", default-features = false, features = ["asset", "cookie", "discover", "font-fontsource", "icon-iconify", "router", "runtime", "serve", "tailwind", "ui", "view"] }
+
+[build-dependencies]
+topcoat = { version = "0.11.0", default-features = false, features = ["icon-iconify", "tailwind"] }
+
+# Speed up compilation while keeping file and line numbers in error backtraces.
+[profile.dev]
+debug = "line-tables-only"
+
+# Speed up compilation by skipping debug information for dependencies.
+[profile.dev.package."*"]
+debug = false

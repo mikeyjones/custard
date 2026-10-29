@@ -1,0 +1,16 @@
+# PostgreSQL for working on the app without The Custard Factory:
+# `docker compose up -d`, and DATABASE_URL in .env points at it.
+services:
+  postgres:
+    image: postgres:17
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: {{name_snake}}_dev
+    ports:
+      - "127.0.0.1:${POSTGRES_PORT:-5432}:5432"
+    volumes:
+      - postgres:/var/lib/postgresql/data
+
+volumes:
+  postgres:

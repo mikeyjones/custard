@@ -1,0 +1,38 @@
+[package]
+name = "custard"
+description = "Build apps on Topcoat that run on The Custard Factory: its database, sign-in, telemetry and file storage."
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+repository.workspace = true
+
+[dependencies]
+topcoat = { workspace = true, features = ["asset", "cookie", "router", "serve", "view", "discover"] }
+topcoat-asset = { workspace = true, features = ["bundler"] }
+
+base64.workspace = true
+dotenvy.workspace = true
+jsonwebtoken.workspace = true
+opentelemetry.workspace = true
+opentelemetry-appender-tracing.workspace = true
+opentelemetry-otlp.workspace = true
+opentelemetry_sdk.workspace = true
+rand.workspace = true
+reqwest.workspace = true
+rusty-s3.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+sha2.workspace = true
+sqlx.workspace = true
+thiserror.workspace = true
+tokio.workspace = true
+tracing.workspace = true
+tracing-opentelemetry.workspace = true
+tracing-subscriber.workspace = true
+url.workspace = true
+
+[dev-dependencies]
+http = "1"
+http-body-util = "0.1"
+jsonwebtoken = { workspace = true, features = ["use_pem"] }

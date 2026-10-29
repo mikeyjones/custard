@@ -1,0 +1,41 @@
+[workspace]
+resolver = "3"
+members = ["crates/custard", "crates/custard-cli"]
+
+[workspace.package]
+version = "0.1.0"
+edition = "2024"
+rust-version = "1.99"
+license = "MIT"
+repository = "https://github.com/mikeyjones/custard"
+
+[workspace.dependencies]
+custard = { path = "crates/custard", version = "0.1.0" }
+
+topcoat = { version = "0.11.0", default-features = false }
+topcoat-asset = { version = "0.11.0" }
+topcoat-cli = { version = "=0.11.0" }
+
+anyhow = "1"
+base64 = "0.22"
+clap = { version = "4.6", features = ["derive"] }
+dotenvy = "0.15"
+jsonwebtoken = { version = "11.1", default-features = false, features = ["rust_crypto"] }
+opentelemetry = "0.33"
+opentelemetry-appender-tracing = "0.33"
+opentelemetry-otlp = { version = "0.33", default-features = false, features = ["http-proto", "reqwest-blocking-client", "trace", "logs"] }
+opentelemetry_sdk = { version = "0.33", features = ["trace", "logs"] }
+rand = "0.9"
+reqwest = { version = "0.13", features = ["json"] }
+rusty-s3 = "0.11"
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+sha2 = "0.10"
+sqlx = { version = "0.9", default-features = false, features = ["runtime-tokio", "tls-rustls-ring-webpki", "postgres", "migrate", "macros", "derive", "chrono", "uuid", "json"] }
+thiserror = "2"
+tokio = { version = "1.51.1", features = ["macros", "rt-multi-thread", "signal"] }
+toml_edit = "0.25"
+tracing = "0.1"
+tracing-opentelemetry = { version = "0.34", default-features = false }
+tracing-subscriber = { version = "0.3", features = ["env-filter", "fmt"] }
+url = "2"
