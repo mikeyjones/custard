@@ -5,6 +5,8 @@
 //! The Topcoat CLI is built in: `custard dev`, `fmt`, `ui`, `asset` and `l10n`
 //! are its commands, so nothing else needs installing.
 
+mod add;
+mod common;
 mod new;
 
 use std::{ffi::OsString, process::ExitCode};
@@ -26,6 +28,9 @@ struct Cli {
 enum Command {
     /// Create an app ready to run, and to deploy to The Custard Factory
     New(new::NewArgs),
+    /// Add part of an app, ready to use: a page
+    #[command(subcommand)]
+    Add(add::AddCommand),
     /// Build, bundle and serve the app, reloading it on changes (topcoat dev)
     #[command(disable_help_flag = true)]
     Dev(Passthrough),
@@ -56,6 +61,7 @@ struct Passthrough {
 async fn main() -> ExitCode {
     let (name, passthrough) = match Cli::parse().command {
         Command::New(args) => return new::run(args),
+        Command::Add(command) => return add::run(command),
         Command::Dev(p) => ("dev", p),
         Command::Fmt(p) => ("fmt", p),
         Command::Ui(p) => ("ui", p),

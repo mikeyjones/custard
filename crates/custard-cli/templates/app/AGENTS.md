@@ -11,6 +11,7 @@ https://raw.githubusercontent.com/tokio-rs/topcoat/refs/tags/v0.11.0/llms.txt
 
 | Command | Does |
 | --- | --- |
+| `custard add page /path [--auth] [--role r] [--title T]` | Add a page, its modules and their `mod` declarations; `{name}` segments are path parameters |
 | `custard dev` | Build, bundle assets, serve on http://localhost:3000, reload on changes |
 | `cargo check` | Type-check; run it after every change |
 | `custard fmt --rustfmt` | Format Rust and `view!` bodies |
@@ -21,8 +22,11 @@ https://raw.githubusercontent.com/tokio-rs/topcoat/refs/tags/v0.11.0/llms.txt
 ## Where things go
 
 - **Pages** are `#[page]` functions in `src/app/`. The module path is the URL:
-  `src/app/notes.rs` serves `/notes`. Declare each new module with `mod` in its
-  parent (`src/app.rs`). Link with `href!(module::page)`, never a literal path.
+  `src/app/notes.rs` serves `/notes`. Start each one with `custard add page`,
+  which declares its modules and prints the `href!` to link to it; never write
+  a literal path in a link. `custard add page /posts/{post_id}` makes a page
+  that reads `path_param::<PostId>(cx)`; pages below it read
+  `path_param::<super::PostId>(cx)`.
 - **Form posts and API routes** are `#[route(POST)]` functions beside the page,
   taking `Form(form): Form<T>` or `Json(body): Json<T>`, and answering
   `Ok(see_other(href!(page).resolve(cx)))` after a form.

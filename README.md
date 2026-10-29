@@ -10,14 +10,18 @@ custard new my-shop
 cd my-shop
 docker compose up -d
 custard dev
+custard add page /blog/{post_id} --auth
 ```
+
+Every command runs without prompting, and `--json` reports what it did (or a
+failure with a `code` and a `fix`) as one JSON object, for coding agents.
 
 ## Crates
 
 | Crate | What it is |
 | --- | --- |
 | [`custard`](crates/custard) | The library apps use: `custard::App` runs the app; `.custard(platform)` adds the platform to a Topcoat router |
-| [`custard-cli`](crates/custard-cli) | The `custard` command: `new`, and Topcoat's `dev`, `fmt`, `ui`, `asset` and `l10n` built in |
+| [`custard-cli`](crates/custard-cli) | The `custard` command: `new`, `add page`, and Topcoat's `dev`, `fmt`, `ui`, `asset` and `l10n` built in |
 
 ## What the library covers
 

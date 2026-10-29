@@ -8,10 +8,12 @@
 use std::{
     fs,
     path::{Path, PathBuf},
-    process::{Command, ExitCode, Output},
+    process::{Command, ExitCode},
 };
 
 use serde_json::json;
+
+use crate::common::{Failure, finish, topcoat};
 
 /// Where generated apps get the `custard` crate from, unless told otherwise.
 const DEFAULT_CUSTARD_GIT: &str = "https://github.com/mikeyjones/custard";
@@ -80,63 +82,13 @@ const NOTES_MIGRATION: &str = include_str!("../templates/app/migrations/create_n
 
 pub fn run(args: NewArgs) -> ExitCode {
     let json = args.json;
-    match create(args) {
-        Ok(report) => {
-            if json {
-                println!("{}", serde_json::to_string_pretty(&report).unwrap());
-            } else {
-                println!(
-                    "Created {} in {}",
-                    report["name"].as_str().unwrap(),
-                    report["path"].as_str().unwrap()
-                );
-                println!("\nNext:");
-                for step in report["next"].as_array().unwrap() {
-                    println!("  {}", step.as_str().unwrap());
-                }
-            }
-            ExitCode::SUCCESS
-        }
-        Err(failure) => {
-            if json {
-                println!(
-                    "{}",
-                    serde_json::to_string_pretty(&json!({
-                        "ok": false,
-                        "error": { "code": failure.code, "message": failure.message, "fix": failure.fix },
-                    }))
-                    .unwrap()
-                );
-            } else {
-                eprintln!("error: {}", failure.message);
-                if let Some(fix) = failure.fix {
-                    eprintln!("  fix: {fix}");
-                }
-            }
-            ExitCode::FAILURE
-        }
-    }
-}
-
-struct Failure {
-    code: &'static str,
-    message: String,
-    fix: Option<String>,
-}
-
-impl Failure {
-    fn new(code: &'static str, message: impl Into<String>) -> Failure {
-        Failure {
-            code,
-            message: message.into(),
-            fix: None,
-        }
-    }
-
-    fn fix(mut self, fix: impl Into<String>) -> Failure {
-        self.fix = Some(fix.into());
-        self
-    }
+    finish(json, create(args), |report| {
+        format!(
+            "Created {} in {}",
+            report["name"].as_str().unwrap_or_default(),
+            report["path"].as_str().unwrap_or_default()
+        )
+    })
 }
 
 fn create(args: NewArgs) -> Result<serde_json::Value, Failure> {
@@ -251,33 +203,6 @@ fn create(args: NewArgs) -> Result<serde_json::Value, Failure> {
     }))
 }
 
-/// Runs a Topcoat CLI command through this binary, keeping its output
-/// unless it fails.
-fn topcoat(dir: Option<&Path>, args: &[&str]) -> Result<Output, Failure> {
-    let exe = std::env::current_exe()
-        .map_err(|error| Failure::new("internal", format!("cannot find this program: {error}")))?;
-    let mut command = Command::new(exe);
-    command.arg("topcoat").args(args);
-    if let Some(dir) = dir {
-        command.current_dir(dir);
-    }
-    let output = command
-        .output()
-        .map_err(|error| Failure::new("internal", format!("cannot run topcoat: {error}")))?;
-    if !output.status.success() {
-        return Err(Failure::new(
-            "topcoat_failed",
-            format!(
-                "topcoat {} failed:\n{}{}",
-                args.join(" "),
-                String::from_utf8_lossy(&output.stdout),
-                String::from_utf8_lossy(&output.stderr)
-            ),
-        ));
-    }
-    Ok(output)
-}
-
 fn write(root: &Path, path: &str, contents: &str) -> Result<(), Failure> {
     let target = root.join(path);
     if let Some(parent) = target.parent() {
@@ -304,7 +229,7 @@ fn check_name(name: &str) -> Result<(), Failure> {
 }
 
 /// `my-shop` as `My shop`.
-fn words(name: &str) -> String {
+pub fn words(name: &str) -> String {
     let spaced = name.replace(['-', '_'], " ");
     let mut chars = spaced.chars();
     match chars.next() {
